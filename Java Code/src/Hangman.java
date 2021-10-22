@@ -1,11 +1,12 @@
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import java.io.File;
 
 public class Hangman {
+    public static ArrayList<String> characters = new ArrayList<>();
+    public static int wrongAnswers = 0;
     public static Scanner sc(String type){
         if(type == "input"){
             return new Scanner(System.in);
@@ -46,7 +47,6 @@ public class Hangman {
 
         String[] words = getWordsFromFile(wordFile);
         int randomNum = randomGen(words.length, 0);
-        randomNum = 2;
         gameFlow(words[randomNum]);
     }
     //----------------------------Methods Under-----------------------------------
@@ -59,28 +59,42 @@ public class Hangman {
             wordInPieces.add(String.valueOf(word.charAt(i)));
         }
 
-
-        charArray.add("a");
-        charArray.add("s");
-
-        charArray = wordsInCharacters(charArray, word);
-        for (int i = 0; i < charArray.size(); i++) {
-            System.out.print(charArray.get(i));
+        while(wrongAnswers!= 6){
+            charArray = addGuess(charArray, wordInPieces, word);
+            charArray = wordsInCharacters(charArray, word);
+            for (int i = 0; i < charArray.size(); i++) {
+                System.out.print(charArray.get(i));
+            }
+            System.out.println("\nYou have guessed wrong: "+wrongAnswers+" times.");
+            if(wordInPieces.equals(characters)){ //Check the 2 arrays if they are equal then you have guessed the word and win.
+                System.out.println("you win");
+                break;
+            }
+        }
+        if(wrongAnswers == 6){
+            System.out.println("You lost");
         }
 
+
     }
-    public static ArrayList<String> addGuess(ArrayList<String> charArray, String word){
+    public static ArrayList<String> addGuess(ArrayList<String> charArray,ArrayList<String> wordInPieces, String word){
         Scanner scanner = sc("input");
         System.out.println("What is your guess?: ");
         String guess = scanner.nextLine();
         guess = guess.toLowerCase();
         charArray.add(guess);
+
+        if(wordInPieces.contains(guess)){
+            System.out.println("This exist in the word");
+        }else{
+            wrongAnswers++;
+        }
+
         return charArray;
     }
     public static ArrayList<String> wordsInCharacters(ArrayList<String> guessedLetter, String word){
         //This method is only for the visual of the line the words get written on.
-        ArrayList<String> characters = new ArrayList<>();
-        System.out.println(word);
+        characters = new ArrayList<>();
         ArrayList<Integer> charIndex = new ArrayList<>();
         for (int i = 0; i < word.length(); i++) {
             characters.add("_");
@@ -114,15 +128,5 @@ public class Hangman {
  O
 /|\
 /¯\
-int numOfSpecificLetter = count(guessedLetter.get(i), word);
-
-                for (int j = 0; j < word.length(); j++) {
-                    charIndex.add(word.indexOf(guessedLetter.get(i)));
-                }
-                for (int j = 0; j < numOfSpecificLetter; j++) {
-                    System.out.println(j);
-                    characters.set(charIndex.get(j),guessedLetter.get(i));
-                    System.out.println(charIndex.get(j) + guessedLetter.get(i));
-                }
 */
 
