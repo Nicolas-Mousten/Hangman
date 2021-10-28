@@ -5,12 +5,14 @@ public class SaveGame {
     private String word;
     private ArrayList<String> chosenLetters;
     private int wrongAnswers;
+    private static int totalGames;
 
-    public SaveGame(int id, String word, ArrayList<String> chosenLetters, int wrongAnswers) {
-        this.id = id;
+    public SaveGame(String word, ArrayList<String> chosenLetters, int wrongAnswers) {
+        this.id = totalGames;
         this.word = word;
         this.chosenLetters = chosenLetters;
         this.wrongAnswers = wrongAnswers;
+        totalGames++;
     //-------------------Get methods for class
     }
     public int getId(){
@@ -29,6 +31,10 @@ public class SaveGame {
 
     @Override
     public String toString() {
-        return "SavedGame "+ id + "[chosenLetters=" + chosenLetters + ", wrongAnswers=" + wrongAnswers + ']';   //The word is not in this toString method beacuse the player is not meant to know what the word is.
+        return "SavedGame "+ id +
+                "[chosenLetters=" + chosenLetters +
+                ", wrongAnswers=" + wrongAnswers +
+                ']';
+        //The word is not in this toString method beacuse the player is not meant to know what the word is.
     }
 }
