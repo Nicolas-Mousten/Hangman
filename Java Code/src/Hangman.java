@@ -53,10 +53,18 @@ public class Hangman {
         String choice = input().nextLine();
         initializeSaveGameStorage();
         if(choice.equalsIgnoreCase("1")){
-            SaveGame chosenSave = saveGame();
-            word = chosenSave.getWord();
-            charArray = chosenSave.getChosenLetters();
-            wrongAnswers = chosenSave.getWrongAnswers();
+            try {
+                SaveGame chosenSave = saveGame();
+                word = chosenSave.getWord();
+                charArray = chosenSave.getChosenLetters();
+                wrongAnswers = chosenSave.getWrongAnswers();
+            }catch(NullPointerException e){
+                System.out.println("Loading a random word");
+                Scanner wordFile = txtFile();
+                String[] words = getWordsFromFile(wordFile);
+                int randomNum = randomGen(words.length, 0);
+                word = words[randomNum];
+            }
         }else{
             Scanner wordFile = txtFile();
             String[] words = getWordsFromFile(wordFile);
@@ -71,50 +79,49 @@ public class Hangman {
     public static SaveGame saveGame(){
         Scanner sc = csvFile();
         int count = 0;
-        if(savedGames != null) {
-            while (sc.hasNextLine()) {
-                ArrayList<String> tempCharArray = new ArrayList<>();
-                if (count >= 1) {
-                    String line = sc.nextLine();
-                    String[] savedGamesArray = line.split(";");
-                    int id = Integer.parseInt(savedGamesArray[0]);
-                    String word = savedGamesArray[1];
-                    for (int i = 0; i < savedGamesArray[2].length(); i++) {
-                        if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase("[")) {
-                            if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase("_")) {
-                                if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase(",")) {
-                                    if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase(" ")) {
-                                        if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase("]")) {
-                                            tempCharArray.add(String.valueOf(savedGamesArray[2].charAt(i)));
+        try{
+            if(savedGames != null) {
+                while (sc.hasNextLine()) {
+                    ArrayList<String> tempCharArray = new ArrayList<>();
+                    if (count >= 1) {
+                        String line = sc.nextLine();
+                        String[] savedGamesArray = line.split(";");
+                        int id = Integer.parseInt(savedGamesArray[0]);
+                        String word = savedGamesArray[1];
+                        for (int i = 0; i < savedGamesArray[2].length(); i++) {
+                            if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase("[")) {
+                                if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase("_")) {
+                                    if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase(",")) {
+                                        if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase(" ")) {
+                                            if (!String.valueOf(savedGamesArray[2].charAt(i)).equalsIgnoreCase("]")) {
+                                                tempCharArray.add(String.valueOf(savedGamesArray[2].charAt(i)));
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                        int wrongAnswers = Integer.parseInt(savedGamesArray[3]);
+                        SaveGame saved = new SaveGame(word, tempCharArray, wrongAnswers);
+                        savedGames.add(saved);
+                    } else {
+                        firstLine = sc.nextLine();
                     }
-                    int wrongAnswers = Integer.parseInt(savedGamesArray[3]);
-                    SaveGame saved = new SaveGame(word, tempCharArray, wrongAnswers);
-                    savedGames.add(saved);
-                } else {
-                    firstLine = sc.nextLine();
+                    count++;
                 }
-                count++;
+                for (int i = 0; i < savedGames.size(); i++) {
+                    System.out.println(savedGames.get(i));
+                }
             }
-        for (int i = 0; i < savedGames.size(); i++) {
-            System.out.println(savedGames.get(i));
+            System.out.println("Choose the games id to continue the game: ");
+
+            int choice = input().nextInt();
+
+            return savedGames.get(choice);
+        }catch(NumberFormatException r){
+            System.out.println("There are no saved games");
         }
-        }
-        if(savedGames.size() == 0){
-            System.out.println("There are no games saved");
-            System.exit(0);
-        }
-        System.out.println("Choose the games id to continue the game: ");
-
-        int choice = input().nextInt();
-
-        return savedGames.get(choice);
-
-
+        return null;
     }
     public static void initializeSaveGameStorage(){
         Scanner sc = csvFile();
@@ -186,58 +193,78 @@ public class Hangman {
                 //-----------------------------------------get the info from the file to save for new game.
                 Scanner sc = csvFile();
                 int count = 0;
-
-                if(savedGames != null) {
-                    while (sc.hasNextLine()) {
-                        ArrayList<String> tempCharArray = new ArrayList<>();
-                        if (count >= 1) {
-                            String line = sc.nextLine();
-                            String[] arrayOfSavedGames = line.split(";");
-                            int id = Integer.parseInt(arrayOfSavedGames[0]);
-                            String inputWord = arrayOfSavedGames[1];
-                            for (int i = 0; i < arrayOfSavedGames[2].length(); i++) {
-                                if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase("[")) {
-                                    if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase("_")) {
-                                        if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase(",")) {
-                                            if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase(" ")) {
-                                                if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase("]")) {
-                                                    tempCharArray.add(String.valueOf(arrayOfSavedGames[2].charAt(i)));
+                try {
+                    if (savedGames != null) {
+                        while (sc.hasNextLine()) {
+                            ArrayList<String> tempCharArray = new ArrayList<>();
+                            if (count >= 1) {
+                                String line = sc.nextLine();
+                                String[] arrayOfSavedGames = line.split(";");
+                                int id = Integer.parseInt(arrayOfSavedGames[0]);
+                                String inputWord = arrayOfSavedGames[1];
+                                for (int i = 0; i < arrayOfSavedGames[2].length(); i++) {
+                                    if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase("[")) {
+                                        if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase("_")) {
+                                            if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase(",")) {
+                                                if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase(" ")) {
+                                                    if (!String.valueOf(arrayOfSavedGames[2].charAt(i)).equalsIgnoreCase("]")) {
+                                                        tempCharArray.add(String.valueOf(arrayOfSavedGames[2].charAt(i)));
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
+                                int wrongAnswers = Integer.parseInt(arrayOfSavedGames[3]);
+                                SaveGame saved = new SaveGame(inputWord, tempCharArray, wrongAnswers);
+                                savedGames.add(saved);
+                            } else {
+                                sc.nextLine();
                             }
-                            int wrongAnswers = Integer.parseInt(arrayOfSavedGames[3]);
-                            SaveGame saved = new SaveGame(inputWord, tempCharArray, wrongAnswers);
-                            savedGames.add(saved);
-                        } else {
-                            sc.nextLine();
+                            count++;
                         }
-                        count++;
                     }
+                    //----------------------------------------
+                    FileWriter saveFileWriter = new FileWriter(saveData);
+
+                    String inputWord = word;
+                    ArrayList<String> inputCharArray = charArray;
+                    int inputWrongAnswers = wrongAnswers;
+                    SaveGame saveTheGame = new SaveGame(inputWord, inputCharArray, inputWrongAnswers);
+                    savedGames.add(saveTheGame);
+
+                    saveFileWriter.write(firstLine + "\n");//------------------------------------------------------------------------------Header for the csv file input here
+                    for (int i = 0; i < savedGames.size(); i++) {
+                        SaveGame temp = savedGames.get(i);
+                        int writeId = temp.getId();
+                        String writeWord = temp.getWord();
+                        ArrayList<String> writeCharArray = temp.getChosenLetters();
+                        int writeWrongAnswers = temp.getWrongAnswers();
+                        saveFileWriter.write(writeId + ";" + writeWord + ";" + writeCharArray + ";" + writeWrongAnswers + "\n");
+                    }
+                    saveFileWriter.close();
+                }catch(NumberFormatException e) {
+                    //----------------------------------------
+                    FileWriter saveFileWriter = new FileWriter(saveData);
+
+                    String inputWord = word;
+                    ArrayList<String> inputCharArray = charArray;
+                    int inputWrongAnswers = wrongAnswers;
+                    SaveGame saveTheGame = new SaveGame(inputWord, inputCharArray, inputWrongAnswers);
+                    savedGames.add(saveTheGame);
+
+                    saveFileWriter.write(firstLine + "\n");//------------------------------------------------------------------------------Header for the csv file input here
+                    for (int i = 0; i < savedGames.size(); i++) {
+                        SaveGame temp = savedGames.get(i);
+                        int writeId = temp.getId();
+                        String writeWord = temp.getWord();
+                        ArrayList<String> writeCharArray = temp.getChosenLetters();
+                        int writeWrongAnswers = temp.getWrongAnswers();
+                        saveFileWriter.write(writeId + ";" + writeWord + ";" + writeCharArray + ";" + writeWrongAnswers + "\n");
+                    }
+                    saveFileWriter.close();
+
                 }
-                //----------------------------------------
-                FileWriter saveFileWriter = new FileWriter(saveData);
-
-                String inputWord = word;
-                ArrayList<String> inputCharArray = charArray;
-                int inputWrongAnswers = wrongAnswers;
-                SaveGame saveTheGame = new SaveGame(inputWord,inputCharArray,inputWrongAnswers);
-                savedGames.add(saveTheGame);
-
-                saveFileWriter.write(firstLine+"\n");//------------------------------------------------------------------------------Header for the csv file input here
-                for (int i = 0; i < savedGames.size(); i++) {
-                    SaveGame temp = savedGames.get(i);
-                    int writeId = temp.getId();
-                    String writeWord = temp.getWord();
-                    ArrayList<String> writeCharArray = temp.getChosenLetters();
-                    int writeWrongAnswers = temp.getWrongAnswers();
-                    saveFileWriter.write(writeId+";"+writeWord+";"+writeCharArray+";"+writeWrongAnswers+"\n");
-                }
-                saveFileWriter.close();
-
-
             }catch(IOException k){
                 System.out.println("Something is wrong with your storage");
             }
@@ -246,6 +273,7 @@ public class Hangman {
             System.exit(0);
 
         }
+
         else {
             charArray.add(guess);
 
