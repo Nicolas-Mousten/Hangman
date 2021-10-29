@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -70,7 +71,7 @@ public class Hangman {
     public static SaveGame saveGame(){
         Scanner sc = csvFile();
         int count = 0;
-        if(savedGames == null) {
+        if(savedGames != null) {
             while (sc.hasNextLine()) {
                 ArrayList<String> tempCharArray = new ArrayList<>();
                 if (count >= 1) {
@@ -102,6 +103,10 @@ public class Hangman {
         for (int i = 0; i < savedGames.size(); i++) {
             System.out.println(savedGames.get(i));
         }
+        }
+        if(savedGames.size() == 0){
+            System.out.println("There are no games saved");
+            System.exit(0);
         }
         System.out.println("Choose the games id to continue the game: ");
 
@@ -182,7 +187,7 @@ public class Hangman {
                 Scanner sc = csvFile();
                 int count = 0;
 
-                if(savedGames == null) {
+                if(savedGames != null) {
                     while (sc.hasNextLine()) {
                         ArrayList<String> tempCharArray = new ArrayList<>();
                         if (count >= 1) {
